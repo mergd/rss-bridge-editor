@@ -156,7 +156,7 @@ export default function YouTubeFeedEditor() {
         }
         setIsLoading(true);
         const info = await fetchChannelInfo(value);
-        setChannelInfo(info);
+        setChannelInfo(info as { title: string; link: string });
         setIsLoading(false);
       };
 
