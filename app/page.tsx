@@ -1,14 +1,29 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Loader2, Plus, Trash2, Copy, Clipboard, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { fetchChannelInfo, fetchFeedServer } from "@/lib/fetchFeed";
+import { Clipboard, Copy, Loader2, Plus, X } from "lucide-react";
+import { useEffect, useState } from "react";
 import { parseString } from "xml2js";
-import { fetchFeedServer, fetchChannelInfo } from "@/lib/fetchFeed";
+
+interface FeedLink {
+  $: {
+    rel: string;
+    href: string;
+  };
+}
+
+interface FeedEntry {
+  title: [{ _: string }];
+  link: FeedLink[];
+  published: string[];
+  author: [{ name: string[] }];
+}
+
 interface FeedItem {
   title: string;
   link: string;
@@ -63,10 +78,9 @@ export default function YouTubeFeedEditor() {
           return;
         }
 
-        const items = result.feed.entry.map((item: any) => {
+        const items = result.feed.entry.map((item: FeedEntry) => {
           const videoLink =
-            item.link.find((link: any) => link.$?.rel === "alternate")?.$
-              .href || "";
+            item.link.find((link) => link.$.rel === "alternate")?.$.href || "";
 
           return {
             title: item.title?.[0]?._,
@@ -135,7 +149,6 @@ export default function YouTubeFeedEditor() {
     value,
     onChange,
     onRemove,
-    index,
   }: {
     value: string;
     onChange: (value: string) => void;
